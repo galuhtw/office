@@ -15,7 +15,7 @@ app.use(express.json());
 
 // Konfigurasi OpenAI API
 const configuration = new Configuration({
-    apiKey: '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', // Ganti dengan API key Anda
+    apiKey: 'OPENAI_API', // Ganti dengan API key Anda
 });
 const openai = new OpenAIApi(configuration);
 
