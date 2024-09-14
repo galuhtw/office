@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Pengolah Dokumen Berbasis Web</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto py-10">
+        <h1 class="text-3xl font-bold text-center mb-8">Pengolah Dokumen Berbasis Web</h1>
+        <div class="bg-white p-6 rounded shadow-md">
+            <form id="uploadForm">
+                <label class="block mb-2 text-lg font-medium">Unggah Dokumen (PDF, TXT, Word):</label>
+                <input type="file" id="fileInput" accept=".pdf,.txt,.doc,.docx" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
+                <button type="submit" class="mt-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded">Proses Dokumen</button>
+            </form>
+        </div>
+
+        <div id="outputSection" class="mt-10 hidden">
+            <h2 class="text-2xl font-bold mb-4">Hasil Pemrosesan</h2>
+            <table class="min-w-full bg-white">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 border-b">Summary</th>
+                        <th class="py-2 px-4 border-b">Tingkat Kepentingan</th>
+                        <th class="py-2 px-4 border-b">Urgensitas</th>
+                        <th class="py-2 px-4 border-b">Disposisi</th>
+                    </tr>
+                </thead>
+                <tbody id="resultBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="historySection" class="mt-10 hidden">
+            <h2 class="text-2xl font-bold mb-4">Riwayat Dokumen</h2>
+            <ul id="historyList" class="list-disc pl-5">
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('fileInput');
+        const outputSection = document.getElementById('outputSection');
+        const resultBody = document.getElementById('resultBody');
+        const historySection = document.getElementById('historySection');
+        const historyList = document.getElementById('historyList');
+
+        const history = [];
+
+        uploadForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Silakan pilih file untuk diunggah.');
+                return;
+            }
+
+            // Menambahkan nama file ke riwayat
+            history.push(file.name);
+            updateHistory();
+
+            // Simulasi permintaan ke server dan respons dari API OpenAI
+            // Pada implementasi sebenarnya, Anda perlu mengirim file ke server dan memprosesnya
+            const mockResponse = {
+                summary: 'Ini adalah ringkasan dari dokumen.',
+                tingkat_kepentingan: 'Penting',
+                urgensitas: 'Segera',
+                disposisi: 'Harap ditindaklanjuti secepatnya.'
+            };
+
+            updateResults(mockResponse);
+        });
+
+        function updateResults(data) {
+            resultBody.innerHTML = `
+                <tr>
+                    <td class="py-2 px-4 border-b">${data.summary}</td>
+                    <td class="py-2 px-4 border-b">${data.tingkat_kepentingan}</td>
+                    <td class="py-2 px-4 border-b">${data.urgensitas}</td>
+                    <td class="py-2 px-4 border-b">${data.disposisi}</td>
+                </tr>
+            `;
+            outputSection.classList.remove('hidden');
+        }
+
+        function updateHistory() {
+            historyList.innerHTML = '';
+            history.forEach(filename => {
+                const li = document.createElement('li');
+                li.textContent = filename;
+                historyList.appendChild(li);
+            });
+            historySection.classList.remove('hidden');
+        }
+    </script>
+<script>window.parent.postMessage({ action: "ready" }, "*"); 
+ 
+window.console = new Proxy(console, {
+  get(target, prop) {
+    if (['log', 'warn', 'error'].includes(prop)) {
+      return new Proxy(target[prop], {
+        apply(fn, thisArg, args) {
+          fn.apply(thisArg, args);
+          window.parent.postMessage({ action: 'console', 
+            type: prop, 
+            args: args.map((arg) => {
+              try {
+                return JSON.stringify(arg).replace(/^["']|["']$/g, '');
+              } catch (e) {
+                return arg;
+              }
+            }) 
+          }, '*');
+        }
+      });
+    }
+    return target[prop];
+  }
+});
+</script></body>
+</html>
